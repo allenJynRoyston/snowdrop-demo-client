@@ -38,5 +38,5 @@ jobs:
         uses: denoland/deployctl@v1
         with:
           project: "allenjynroy-snowdrop-de-67"
-          entrypoint: "https://deno.land/std@0.217.0/http/server.ts"
-          root: "out"
+          entrypoint: "https://deno.land/std@0.217.0/http/file_server.ts"
+          root: "./out"
