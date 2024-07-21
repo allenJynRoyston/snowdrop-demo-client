@@ -5,6 +5,7 @@ import { SmartTableProps } from '@/types/type';
 import SmartTableEmpty from '@component/SmartTableEmpty'
 import SmartTablePagination from '@component/SmartTablePagination'
 import Iconify from '@component/Iconify';
+import Dropdown from '@component/Dropdown'
 //----------------------
 
 //----------------------
@@ -26,7 +27,7 @@ type DynamicBooleanObject = {
 export default function SmartTable<T extends Record<string, any>>({
   data,
   sortByKey = (_key, _reversed) => {},
-  searchFunc = {},
+  dropdownFunc = {},
   convertFunc = {},
   filterFunc = {},
   isFetching = true,
@@ -82,9 +83,8 @@ export default function SmartTable<T extends Record<string, any>>({
 
   // -------------------------------
   const checkForConversions = (key: string, val: string) => {
-    if (convertFunc.hasOwnProperty(key)) {
-      // ugh ts I just didn't want to deal with it
-      // @ts-ignore
+    if (convertFunc && convertFunc.hasOwnProperty(key)) {    
+      // @ts-ignore  
       return convertFunc[key](val)
     }
     return val
@@ -93,8 +93,7 @@ export default function SmartTable<T extends Record<string, any>>({
 
   // -------------------------------
   const checkForFilter = (key: string, val: string) => {
-    if (filterFunc.hasOwnProperty(key)) {
-      // same as above
+    if (filterFunc && filterFunc.hasOwnProperty(key)) {
       // @ts-ignore
       return filterFunc[key](val)
     }
@@ -119,8 +118,31 @@ export default function SmartTable<T extends Record<string, any>>({
       {isFetching ? (
         <p className='text-red-400 text-center'>One sec please...</p>
       ) : (
-        <div className='flex flex-col gap-2 '>
-          <table className="min-w-full divide-y divide-gray-200">
+        <div className='flex flex-col gap-10 bg-slate-300 min-h-[600px] p-10 rounded-md'>
+
+          <SmartTablePagination
+            totalEntries={data.length}
+            currentPage={currentPage}
+            entriesPerPage={entriesPerPage}
+            handleClick={handleClick}
+          />
+
+          <div className='flex gap-10 items-center justify-between text-black'>
+            <p className=''>Total entries: {data.length}</p>
+            <div className='flex gap-2 items-center'>
+              <p>List size:</p>
+              <div className='w-[200px] text-black'>
+                <Dropdown 
+                  items={[50, 100, 150, 200]}  
+                  onSelection={(val) => {
+                    setEntriesPerPage(val)
+                  }}
+                  />          
+              </div>
+            </div>
+          </div>
+
+          <table className="min-w-full divide-y divide-gray-200 ">
             <thead className="bg-gray-100">
               <tr>
                 {Object.keys(tableHeaders).map((key) => (
@@ -160,9 +182,24 @@ export default function SmartTable<T extends Record<string, any>>({
                       </div>
                     </td>
                   ) : (
-                    <td key={key} className={classNames.td}></td>
+                    dropdownFunc.hasOwnProperty(key) ? (
+                      <td key={key} className={classNames.td}>
+                        <div className='flex gap-1 text-black items-center w-min-[150px]'>
+                          <Dropdown 
+                            items={["All", "Failed", "Completed", "Refunded", "Pending", "In Review", "Cancelled"]}  
+                            onSelection={(val) => {
+                              dropdownFunc[key](val)                              
+                            }}
+                            />
+                        </div>
+                      </td>
+                    ) : (
+                      <td key={key} className={classNames.td}></td>
+                    )
                   )
                 ))}
+
+                
               </tr>
               {data.length === 0 ? (
                 <tr className='w-full'>

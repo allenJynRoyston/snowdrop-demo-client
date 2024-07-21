@@ -15,6 +15,7 @@ export default function TransactionsPage() {
   const [tableData, setTableData] = useState<TypeTransaction[]>([])
   const [isFetching, setIsFetching] = useState<boolean>(true)
   const [hasError, setHasError] = useState<boolean>(true)
+  const [filterByKeys, setFilterByKeys] = useState<Record<string, string | null>>({});
   const inDevMode:Boolean = process.env.NODE_ENV === 'development'
   const lsKey:string = "transactions"
   const debounceTime:number = 300
@@ -55,42 +56,84 @@ export default function TransactionsPage() {
   // ------------------------
 
   // ------------------------
+  const dropdownFunc = {
+    transaction_status: (val:any):void => {
+      var filter_val:null | string = null
+
+      switch (val) {
+        case "Pending":
+          filter_val = "0"
+          break
+        case "Completed":
+          filter_val = "1"
+          break
+        case "Failed":
+          filter_val = "2"
+          break
+        case "Cancelled":
+          filter_val = "3"
+          break
+        case "Refunded":
+          filter_val = "4"
+          break
+        case "In Review":
+          filter_val = "5"
+          break
+      }   
+
+      filterByKeys.transaction_status = filter_val
+
+      customFilter()
+    },  
+  }
+   // ------------------------  
+
+  // ------------------------
   // would normally send this to the server and have it return the filtered dataset, but
   // again for demo purposes it's just done locally
   const filterFunc = {
     _id: debounce((val: string) => {
-      customFilter(val, "_id")
+      filterByKeys._id = val.length === 0 ? null : val
+      customFilter()
     }, debounceTime),    
     id: debounce((val: string) => {
-      customFilter(val, "id")
+      filterByKeys.id = val.length === 0 ? null : val
+      customFilter()
     }, debounceTime),   
     userid: debounce((val: string) => {
-      customFilter(val, "userid")
+      filterByKeys.userid = val.length === 0 ? null : val
+      customFilter()
     }, debounceTime),   
     username: debounce((val: string) => {
-      customFilter(val, "username")
+      filterByKeys.username = val.length === 0 ? null : val
+      customFilter()
     }, debounceTime),      
     amount: debounce((val: string) => {
-      customFilter(val, "amount")
+      filterByKeys.amount = val.length === 0 ? null : val
+      customFilter()
     }, debounceTime), 
     date: debounce((val: string) => {
-      customFilter(val, "date")
+      filterByKeys.date = val.length === 0 ? null : val
+      customFilter()
     }, debounceTime),                    
     vender: debounce((val: string) => {
-      customFilter(val, "vender")
+      filterByKeys.vender = val.length === 0 ? null : val
+      customFilter()
     }, debounceTime)    
   }
 
-  function customFilter(val:string, key:string){
-    if(val.length === 0){
-      setTableData(restoreData)
-      return
-    }
-
+  function customFilter(){
     let filterd = [...restoreData]; 
 
-    filterd = filterd.filter((item:any) => {      
-      return String(item[key]).includes(val);  
+    filterd = filterd.filter((item:any) => {  
+      var has_match:Boolean = true
+      Object.keys(item).forEach((key) => {   
+        if(filterByKeys[key] !== null && has_match){
+          has_match = String(item[key].toLowerCase()).includes(filterByKeys[key].toLowerCase())
+        }
+      })
+
+      return has_match
     })
     
     setTableData(filterd)    
@@ -143,6 +186,16 @@ export default function TransactionsPage() {
   // ------------------------
 
   // ------------------------
+  function setupFilterKeys(entry){
+    var filter_by = {}
+    Object.keys(entry).forEach((key) => {   
+      filter_by[key] = null
+    })
+    setFilterByKeys(filter_by)
+  }
+  // ------------------------
+
+  // ------------------------
   useEffect(() => {
     fetchTransactions();
   }, []);
@@ -150,7 +203,6 @@ export default function TransactionsPage() {
 
   // ------------------------
   async function fetchTransactions(){
-     
       // fetch from local storage check 
       // wanted to save this to localStorage while developing 
       // so I don't burn my free api calls while testing
@@ -161,6 +213,10 @@ export default function TransactionsPage() {
           setRestoreData(parsed)
           setTableData(parsed)
           setIsFetching(false)
+
+          if(parsed.length > 0){
+            setupFilterKeys(parsed[0])
+          }          
           return
         }
       }
@@ -184,6 +240,10 @@ export default function TransactionsPage() {
         setRestoreData(res)
         setTableData(res) 
 
+        if(res.length > 0){
+          setupFilterKeys(res[0])
+        }              
+
         if(inDevMode){
           localStorage.setItem(lsKey, JSON.stringify(res));
         }
@@ -204,7 +264,15 @@ export default function TransactionsPage() {
           <h1>Transactions</h1>
         </div>
         <div className='w-full h-auto'>
-          <SmartTable data={tableData} convertFunc={convertFunc} filterFunc={filterFunc} isFetching={isFetching} hasError={hasError} sortByKey={sortByKey} />
+          <SmartTable 
+          data={tableData} 
+          convertFunc={convertFunc} 
+          filterFunc={filterFunc} 
+          dropdownFunc={dropdownFunc}
+          isFetching={isFetching} 
+          hasError={hasError} 
+          sortByKey={sortByKey} 
+          />
         </div>
     </>
   )

@@ -1,47 +1,36 @@
 import React, { useState, useRef, useEffect, MouseEvent } from 'react';
+import {DropdownProps} from '@type/type'
 
-// Define types for the Dropdown props
-interface DropdownProps {
-  items: string[];
-  onSelect: (item: string) => void;
-  onClose: () => void;
-}
 
-// Dropdown component
-const Dropdown: React.FC<DropdownProps> = ({ items, onSelect, onClose }) => {
+const Dropdown = <T,>({ items, onSelect, onClose }: DropdownProps<T>) => {
   return (
     <ul className="absolute bg-white border border-gray-300 mt-2 w-full shadow-lg z-10">
       {items.map((item) => (
         <li
-          key={item}
+          key={String(item)} // Ensure the key is a string
           className="p-2 hover:bg-gray-200 cursor-pointer"
           onClick={() => {
             onSelect(item);
             onClose();
           }}
         >
-          {item}
+          {String(item)} 
         </li>
       ))}
     </ul>
   );
 };
 
-// Define types for the InputButtonWithDropdown state
-type Item = 'Item A' | 'Item B' | 'Item C';
-
-const InputButtonWithDropdown: React.FC = () => {
+const InputButtonWithDropdown = <T,>({ items, onSelection }: { items: T[], onSelection:(_val:unknown) => {} }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [selectedItem, setSelectedItem] = useState<Item | ''>('');
+  const [selectedItem, setSelectedItem] = useState<T | ''>('');
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
-  // Toggle dropdown visibility
   const toggleDropdown = () => setIsOpen((prev) => !prev);
-
-  // Handle item selection
-  const handleSelect = (item: Item) => setSelectedItem(item);
-
-  // Close dropdown if clicked outside
+  const handleSelect = (item: T) => {
+    setSelectedItem(item)
+    onSelection(item)
+  };
   const handleClickOutside = (event: MouseEvent) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
       setIsOpen(false);
@@ -54,17 +43,17 @@ const InputButtonWithDropdown: React.FC = () => {
   }, []);
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <button
         onClick={toggleDropdown}
-        className="px-4 py-2 border rounded bg-blue-500 text-white"
+        className="px-4 py-2 border rounded bg-slate-500 text-white w-full"
       >
-        {selectedItem || 'Select an item'}
+        {selectedItem || 'Select an option...'}
       </button>
       {isOpen && (
         <div ref={dropdownRef}>
           <Dropdown
-            items={['Item A', 'Item B', 'Item C']}
+            items={items}
             onSelect={handleSelect}
             onClose={() => setIsOpen(false)}
           />

@@ -4,8 +4,8 @@ export type TypeTransaction = {
   username: string
   userid: string
   amount: string
-  date: Date // Ideally this should be a Date type, but whatever it's fine for this
-  transaction_status: number
+  date: Date 
+  transaction_status: number 
   vender: string
 }
 
@@ -30,6 +30,12 @@ export type SmartTablePaginationProps = {
   currentPage: number;
   handleClick: (page: number) => void;
 };
+
+export type DropdownProps<T> = {
+  items: T[];
+  onSelect: (item: T) => void;
+  onClose: () => void;
+}
 
 export type IconTypes = 'home' | 'dashboard' | 'businessman' | 'arrowup' | 'arrowdown' | 'filter' | 'cross'
 
