@@ -1,0 +1,1 @@
+export const apiUrl = "https://snowdrop-test-server.onrender.com"
