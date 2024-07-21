@@ -184,11 +184,14 @@ export default function TransactionsPage() {
     setTableData(reversed ? sorted.reverse() : sorted )
   }
   // ------------------------
+  
+  // ------------------------
 
   // ------------------------
-  function setupFilterKeys(entry){
+  function setupFilterKeys(entry:any){
     var filter_by = {}
     Object.keys(entry).forEach((key) => {   
+      // @ts-ignore
       filter_by[key] = null
     })
     setFilterByKeys(filter_by)
