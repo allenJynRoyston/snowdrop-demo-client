@@ -129,7 +129,7 @@ export default function TransactionsPage() {
       var has_match:Boolean = true
       Object.keys(item).forEach((key) => {   
         if(filterByKeys[key] !== null && has_match){
-          has_match = String(item[key].toLowerCase()).includes(filterByKeys[key].toLowerCase())
+          has_match = String(item[key]).toLowerCase().includes(filterByKeys[key].toLowerCase())
         }
       })
 

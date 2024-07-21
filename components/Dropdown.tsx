@@ -21,7 +21,7 @@ const Dropdown = <T,>({ items, onSelect, onClose }: DropdownProps<T>) => {
   );
 };
 
-const InputButtonWithDropdown = <T,>({ items, onSelection }: { items: T[], onSelection:(_val:unknown) => {} }) => {
+const InputButtonWithDropdown = <T,>({ items, defaultText = "Select an option", onSelection }: { items: T[], defaultText:String , onSelection:(_val:unknown) => {} }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<T | ''>('');
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -48,7 +48,7 @@ const InputButtonWithDropdown = <T,>({ items, onSelection }: { items: T[], onSel
         onClick={toggleDropdown}
         className="px-4 py-2 border rounded bg-slate-500 text-white w-full"
       >
-        {selectedItem || 'Select an option...'}
+        {selectedItem || defaultText}
       </button>
       {isOpen && (
         <div ref={dropdownRef}>

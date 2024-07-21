@@ -134,6 +134,7 @@ export default function SmartTable<T extends Record<string, any>>({
               <div className='w-[200px] text-black'>
                 <Dropdown 
                   items={[50, 100, 150, 200]}  
+                  defaultText={"50"}
                   onSelection={(val) => {
                     setEntriesPerPage(val)
                   }}
@@ -177,7 +178,7 @@ export default function SmartTable<T extends Record<string, any>>({
                         <input
                           type="text"
                           className={`${classNames.input} w-full`}
-                          onChange={(event: React.ChangeEvent<HTMLInputElement>) => checkForFilter(key, event.target.value)}
+                          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {checkForFilter(key, event.target.value)}}
                         />
                       </div>
                     </td>
@@ -186,6 +187,7 @@ export default function SmartTable<T extends Record<string, any>>({
                       <td key={key} className={classNames.td}>
                         <div className='flex gap-1 text-black items-center w-min-[150px]'>
                           <Dropdown 
+                            defaultText={"All"}
                             items={["All", "Failed", "Completed", "Refunded", "Pending", "In Review", "Cancelled"]}  
                             onSelection={(val) => {
                               dropdownFunc[key](val)                              
