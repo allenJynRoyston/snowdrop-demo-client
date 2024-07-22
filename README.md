@@ -35,9 +35,11 @@ Easy-peasy, one-two-,uh, npm run <em>build-sy</em>...  "¯\_(ツ)_/¯ "
 
 ```bash
 npm run build
-# or even better
+# ... once it's done
 npm run start
 ```
+
+Again, open [http://localhost:3000](http://localhost:3000) with your browser to bask in all its (built) glory.
 
 ## Wait, what about the server?  Where's this data coming from?
 The sever lives in its own repo and is deployed to a [render.com](https://render.com).  This is done to prevent any COR (cross-origin request) issues while developing and ensures 
