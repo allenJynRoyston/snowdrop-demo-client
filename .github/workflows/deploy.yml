@@ -37,6 +37,6 @@ jobs:
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
         with:
-          project: "allenjynroy-snowdrop-de-67"
+          project: "allenjynroy-snowdrop-app"
           entrypoint: "https://deno.land/std@0.217.0/http/file_server.ts"
           root: "./out"
