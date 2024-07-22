@@ -1,36 +1,121 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## TL;DR
+[Live version here](https://allenjynroy-snowdrop-app.deno.dev)
+[Server is live here](https://snowdrop-test-server.onrender.com)
 
-## Getting Started
 
-First, run the development server:
+## Running locally
+Super simple.  First, clone this repo.  
+
+```bash
+git clone https://github.com/allenJynRoyston/snowdrop-demo-client.git
+```
+
+Next, install dependencies.  There's not a ton so it should be quick.
+
+```bash
+npm install
+# or even better
+pnpm install
+```
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+🎉 Tada! 🎉
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Open [http://localhost:3000](http://localhost:3000) with your browser to bask in all its glory.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-## Learn More
+## Build it
+Easy-peasy, one-two-,uh, npm run build-y.
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run build
+# or even better
+npm run start
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Test it
+There's no testing.  I'm only one man.  One ridicously good looking and *humble* man, but one man nonetheless.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Wait, what about the server?  Where's this data coming from?
+The sever lives in its own repo and is deployed to a render site.  This is done to prevent and CORS while developing and ensures 
+it'll work everywhere (dev/live environment).  The repo is private because it has username/passwords in it to access the database, but
+the code is quite simple as it's just a means to return some data.  Quite simply, it looks like this
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+import express from 'express';
+import fs from 'fs';
+import cors from 'cors'
+import { MongoClient, ServerApiVersion } from 'mongodb';
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+// Load MongoDB credentials from a JSON file
+// ** I would never include sensitive information like files (i.e. username/password); this is ONLY for the demo
+const {username, password} = JSON.parse(fs.readFileSync('./secrets.json', 'utf8'));
+
+// Initialize Express application
+const app = express();
+const port = process.env.PORT || 3000
+
+// MongoDB client and options 
+const client = new MongoClient(`mongodb+srv://${username}:${password}@demodb.68uhv6d.mongodb.net/?retryWrites=true&w=majority&appName=demoDB`, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
+
+
+// Connection function
+async function connectToMongoDB() {
+  try {
+    await client.connect();
+    await client.db("demo").command({ ping: 1 });
+    console.warn("Connected to MongoDB.");
+  } catch (error) {
+    console.error('Error connecting to MongoDB:', error);
+  }
+}
+
+// allow cross origin requests
+app.use(cors())
+
+
+// Express routes
+app.get('/', (_, res) => {
+  res.json({ status: 'Server is functioning.' });
+});
+
+app.get('/transactions', async (req, res) => {
+  try {
+    const transactions = await client.db("demo").collection('transactions').find().toArray();
+    res.json(transactions);
+  } catch (err) {
+    console.error('Error fetching transactions:', err);
+    res.status(500).send('Error fetching transactions');
+  }
+});
+
+
+// Start the Express server and connect to MongoDB
+app.listen(port, async () => {
+  console.warn(`Server is running at http://localhost:${port}`);
+  await connectToMongoDB();
+});
+```
+
+As you can tell, there's only one endpoint.  
+https://snowdrop-test-server.onrender.com/transactions
+
+I meant to expand this a bit but I think this is enough for a proof of concept.
+
+## Any questions?
+Hit me up you got the deets.
+
+
+## Now hire me!
+Show me that 💸, 🍯.
