@@ -19,6 +19,8 @@ npm install
 pnpm install
 ```
 
+Now run that bad boy.
+
 ```bash
 npm run dev
 ```
@@ -36,10 +38,6 @@ npm run build
 # or even better
 npm run start
 ```
-
-## Test it
-There's no testing.  I'm only one man.  One ridicously good looking and *humble* man, but one man nonetheless.
-
 
 ## Wait, what about the server?  Where's this data coming from?
 The sever lives in its own repo and is deployed to a render site.  This is done to prevent and CORS while developing and ensures 
@@ -113,6 +111,10 @@ As you can tell, there's only one endpoint.
 https://snowdrop-test-server.onrender.com/transactions
 
 I meant to expand this a bit but I think this is enough for a proof of concept.
+
+## Test it
+There's no testing.  I'm only one man.  One ridicously good looking and *humble* man, but one man nonetheless.
+
 
 ## Any questions?
 Hit me up you got the deets.
