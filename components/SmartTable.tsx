@@ -1,10 +1,11 @@
 //----------------------
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { SmartTableProps } from '@/types/type';
+import { SmartTableProps, DynamicBooleanObject } from '@/types/type';
 
 import SmartTableEmpty from '@component/SmartTableEmpty'
 import SmartTablePagination from '@component/SmartTablePagination'
-import Iconify from '@component/Iconify';
+import SmartTableInfo from '@component/SmartTableInfo';
+import Iconify from '@component/Iconify'
 import Dropdown from '@component/Dropdown'
 //----------------------
 
@@ -15,19 +16,14 @@ const classNames = {
   td: 'px-6 py-4 text-black whitespace-nowrap',  
   input: 'border border-gray-300 shadow-sm placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
 }
-
-type DynamicBooleanObject = {
-  [key: string]: boolean
-}
 //----------------------
-
-
 
 //----------------------
 export default function SmartTable<T extends Record<string, any>>({
   data,
   sortByKey = (_key, _reversed) => {},
   dropdownFunc = {},
+  dropdownList = {},
   convertFunc = {},
   filterFunc = {},
   isFetching = true,
@@ -82,7 +78,7 @@ export default function SmartTable<T extends Record<string, any>>({
   // -------------------------------
 
   // -------------------------------
-  const checkForConversions = (key: string, val: string) => {
+  function checkForConversions(key: string, val: string){
     if (convertFunc && convertFunc.hasOwnProperty(key)) {    
       // @ts-ignore  
       return convertFunc[key](val)
@@ -92,7 +88,7 @@ export default function SmartTable<T extends Record<string, any>>({
   // -------------------------------
 
   // -------------------------------
-  const checkForFilter = (key: string, val: string) => {
+  function checkForFilter(key: string, val: string){
     if (filterFunc && filterFunc.hasOwnProperty(key)) {
       // @ts-ignore
       return filterFunc[key](val)
@@ -102,141 +98,150 @@ export default function SmartTable<T extends Record<string, any>>({
   // -------------------------------
 
   // -------------------------------
-  const handleClick = (index: number) => {
+  function onPaginationUpdate(index: number){
     setCurrentPage(index)
   }
   // -------------------------------
 
   // -------------------------------
-  if (data.length === 0 && !isFetching && !isLoaded) {
-    return <SmartTableEmpty />;
+  function getPaginatedData(){
+    if(data.length < currentPage * entriesPerPage){
+      return data
+    }
+    return data.slice(currentPage * entriesPerPage, (currentPage + 1) * entriesPerPage)
   }
   // -------------------------------
 
   return (
-    <div className="overflow-x-auto pb-10">
-      {isFetching ? (
-        <p className='text-red-400 text-center'>One sec please...</p>
+    <>
+      {data.length === 0 && !isFetching && !isLoaded ? (
+        <SmartTableEmpty />
       ) : (
-        <div className='flex flex-col gap-10 bg-slate-300 min-h-[600px] p-10 rounded-md'>
-
-          <SmartTablePagination
-            totalEntries={data.length}
-            currentPage={currentPage}
-            entriesPerPage={entriesPerPage}
-            handleClick={handleClick}
-          />
-
-          <div className='flex gap-10 items-center justify-between text-black'>
-            <p className=''>Total entries: {data.length}</p>
-            <div className='flex gap-2 items-center'>
-              <p>List size:</p>
-              <div className='w-[200px] text-black'>
-                <Dropdown 
-                  items={[50, 100, 150, 200]}  
-                  defaultText={"50"}
-                  onSelection={(val) => {
-                    setEntriesPerPage(val)
-                  }}
-                  />          
-              </div>
-            </div>
-          </div>
-
-          <table className="min-w-full divide-y divide-gray-200 ">
-            <thead className="bg-gray-100">
-              <tr>
-                {Object.keys(tableHeaders).map((key) => (
-                  <th key={key} className={classNames.th}>
-                    <button
-                      className={classNames.headerBtn}
-                      onClick={() => {
-                        if (memoizedHeaderData && memoizedHeaderData.hasOwnProperty(key)) {
-                          memoizedHeaderData[key] = !memoizedHeaderData[key];
-                          setHeaderData({ ...memoizedHeaderData });
-                          sortByKey(key, memoizedHeaderData[key]);
-                        }
-                      }}
-                    >
-                      {key.replaceAll("_", " ")}
-                      {memoizedHeaderData && memoizedHeaderData.hasOwnProperty(key) ? (
-                        <Iconify type={memoizedHeaderData[key] ? 'arrowdown' : 'arrowup'} />
-                      ) : null}
-                    </button>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-
-            <tbody className="bg-white divide-y divide-gray-200">
-              <tr>
-                {Object.keys(tableHeaders).map((key) => (
-                  filterFunc.hasOwnProperty(key) ? (
-                    <td key={key} className={classNames.td}>
-                      <div className='flex gap-1 text-black items-center'>
-                        <Iconify type='filter' height={15} width={15} />
-                        <input
-                          type="text"
-                          className={`${classNames.input} w-full`}
-                          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {checkForFilter(key, event.target.value)}}
-                        />
-                      </div>
-                    </td>
-                  ) : (
-                    dropdownFunc.hasOwnProperty(key) ? (
-                      <td key={key} className={classNames.td}>
-                        <div className='flex gap-1 text-black items-center w-min-[150px]'>
-                          <Dropdown 
-                            defaultText={"All"}
-                            items={["All", "Failed", "Completed", "Refunded", "Pending", "In Review", "Cancelled"]}  
-                            onSelection={(val) => {
-                              dropdownFunc[key](val)                              
-                            }}
-                            />
-                        </div>
-                      </td>
-                    ) : (
-                      <td key={key} className={classNames.td}></td>
-                    )
-                  )
-                ))}
-
-                
-              </tr>
-              {data.length === 0 ? (
-                <tr className='w-full'>
-                  {Object.keys(tableHeaders).map((key) => (
-                    <td key={key} className={classNames.td} style={{"width": `${elementWidths[key]}px`}}>
-                      {elementWidths[key]}
-                    </td>
-                  ))}
-                </tr>
-              ) : (
-                data.slice(currentPage * entriesPerPage, (currentPage + 1) * entriesPerPage).map((item) => (
-                  <tr key={item._id}>
+        <div className="overflow-x-auto pb-10">
+          {isFetching ? (
+            <>
+              <p className='text-red-400 text-center'>
+                The server is sleeping... waking it up now :D
+                <br></br>
+                (It could take a minute)
+              </p>              
+            </>
+          ) : (
+            <div className='flex flex-col gap-10 bg-slate-300 bg-opacity-70 min-h-[600px] p-10 rounded-xl'>
+  
+              <SmartTablePagination
+                totalEntries={data.length}
+                currentPage={currentPage}
+                entriesPerPage={entriesPerPage}
+                handleClick={onPaginationUpdate}
+              />
+  
+              <SmartTableInfo data={data} onSizeSelection={(val) => setEntriesPerPage(val)} />
+                  
+              <table className="min-w-full divide-y divide-gray-200 text-xs">
+                {/* ------------ HEADER ---------------- */}
+                <thead className="bg-gray-100">
+                  <tr>
                     {Object.keys(tableHeaders).map((key) => (
-                      <td
-                        key={key}
-                        className={classNames.td}
-                        ref={(el) => (tdRefs.current[key] = el)}
-                      >
-                        {checkForConversions(key, item[key as keyof T])}
-                      </td>
+                      <th key={key} className={classNames.th}>
+                        <button
+                          className={classNames.headerBtn}
+                          onClick={() => {
+                            if (memoizedHeaderData && memoizedHeaderData.hasOwnProperty(key)) {
+                              memoizedHeaderData[key] = !memoizedHeaderData[key];
+                              setHeaderData({ ...memoizedHeaderData });
+                              sortByKey(key, memoizedHeaderData[key]);
+                            }
+                          }}
+                        >
+                          {key.replaceAll("_", " ")}
+                          {memoizedHeaderData && memoizedHeaderData.hasOwnProperty(key) ? (
+                            <Iconify type={memoizedHeaderData[key] ? 'arrowdown' : 'arrowup'} />
+                          ) : null}
+                        </button>
+                      </th>
                     ))}
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                </thead>
+  
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {/* ------------ FILTERS AND DROPDOWNS ---------------- */}
+                  <tr>
+                    {Object.keys(tableHeaders).map((key) => (
+                      filterFunc.hasOwnProperty(key) ? (
+                        <td key={key} className={classNames.td}>
+                          <div className='flex gap-1 text-black items-center'>
+                            <Iconify type='filter' height={15} width={15} />
+                            <input
+                              type="text"
+                              className={`${classNames.input} w-full`}
+                              onChange={(event: React.ChangeEvent<HTMLInputElement>) => { checkForFilter(key, event.target.value) }}
+                            />
+                          </div>
+                        </td>
+                      ) : (
+                        dropdownFunc.hasOwnProperty(key) ? (
+                          <td key={key} className={classNames.td}>
+                            <div className='flex gap-1 text-black items-center w-min-[150px]'>
+                              <Dropdown 
+                                defaultSelection={0}
+                                items={dropdownList[key]}  
+                                onSelection={(val) => {
+                                   // @ts-ignore
+                                  dropdownFunc[key](val)                              
+                                }}
+                              />
+                            </div>
+                          </td>
+                        ) : (
+                          <td key={key} className={classNames.td}></td>
+                        )
+                      )
+                    ))}
+                  </tr>
+                 
+                  {data.length === 0 ? (
+                    /* ------------ WHEN EMPTY, PRESERVES THE CORRECT WIDTH OF THE GRID ---------------- */
+                    <tr className='w-full'>
+                      {Object.keys(tableHeaders).map((key) => (
+                        <td key={key} className={classNames.td} style={{ "width": `${elementWidths[key]}px` }}>
+                          {elementWidths[key]}
+                        </td>
+                      ))}
+                    </tr>
+                  ) : (
+                    /* ------------ GRID CONTENT ------------------------------------------------------- */
+                    getPaginatedData().map((item) => (
+                      <tr key={item._id}>
+                        {Object.keys(tableHeaders).map((key) => (
+                          <td
+                            key={key}
+                            className={classNames.td}
+                             // @ts-ignore
+                            ref={(el) => (tdRefs.current[key] = el)}
+                          >
+                            {checkForConversions(key, item[key as keyof T])}
+                          </td>
+                        ))}
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+              
 
-          <SmartTablePagination
-            totalEntries={data.length}
-            currentPage={currentPage}
-            entriesPerPage={entriesPerPage}
-            handleClick={handleClick}
-          />
+              <SmartTablePagination
+                totalEntries={data.length}
+                currentPage={currentPage}
+                entriesPerPage={entriesPerPage}
+                handleClick={onPaginationUpdate}
+              />
+  
+            </div>
+          )}
         </div>
       )}
-    </div>
+    </>
   );
+  
 }

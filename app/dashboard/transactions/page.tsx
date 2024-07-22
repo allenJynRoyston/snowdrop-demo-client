@@ -56,6 +56,10 @@ export default function TransactionsPage() {
   // ------------------------
 
   // ------------------------
+  const dropdownList = {
+    transaction_status: ["All", "Failed", "Completed", "Refunded", "Pending", "In Review", "Cancelled"]
+  }
+
   const dropdownFunc = {
     transaction_status: (val:any):void => {
       var filter_val:null | string = null
@@ -262,7 +266,7 @@ export default function TransactionsPage() {
 
   // ------------------------
   return (
-    <>
+    <div className='p-10 flex flex-col gap-10'>
         <div className='flex justify-center items-center'>
           <h1>Transactions</h1>
         </div>
@@ -272,12 +276,13 @@ export default function TransactionsPage() {
           convertFunc={convertFunc} 
           filterFunc={filterFunc} 
           dropdownFunc={dropdownFunc}
+          dropdownList={dropdownList}
           isFetching={isFetching} 
           hasError={hasError} 
           sortByKey={sortByKey} 
           />
         </div>
-    </>
+    </div>
   )
   // ------------------------
 }

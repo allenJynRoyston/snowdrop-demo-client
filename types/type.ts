@@ -9,8 +9,16 @@ export type TypeTransaction = {
   vender: string
 }
 
+export type DynamicBooleanObject = {
+  [key: string]: boolean
+}
+
 export type GenericFunc<T> = {
   [K in keyof T]?: (value: T[K]) => any;
+};
+
+export type DropdownListType<K extends string> = {
+  [key in K]?: string[];
 };
 
 export  type SmartTableProps<T> = {
@@ -18,6 +26,7 @@ export  type SmartTableProps<T> = {
   convertFunc?: GenericFunc<T>
   searchFunc?: GenericFunc<T>
   filterFunc?: GenericFunc<T>
+  dropdownList?: DropdownListType<keyof T & string>
   dropdownFunc?: GenericFunc<T>
   isFetching?: boolean
   hasError?: boolean
@@ -32,10 +41,22 @@ export type SmartTablePaginationProps = {
 };
 
 export type DropdownProps<T> = {
+  items: T[]
+  defaultSelection: number
+  onSelection: (val: T) => void
+}
+
+export type DropdownMenuProps<T> = {
   items: T[];
   onSelect: (item: T) => void;
   onClose: () => void;
 }
+
+export type SmartTableInfoProps<T> = {
+  data: T[];
+  onSizeSelection: (size: number) => void;
+}
+
 
 export type IconTypes = 'home' | 'dashboard' | 'businessman' | 'arrowup' | 'arrowdown' | 'filter' | 'cross'
 

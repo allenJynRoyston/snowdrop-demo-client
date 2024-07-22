@@ -18,7 +18,7 @@ import type {IconTypes} from '@type/type'
 
 // -------------------------------
 const Iconify: React.FC<{ type: IconTypes } & SVGProps<SVGSVGElement>> = ({ type, ...props }) => {
-  let useIcon = AdmimHome; // Default icon
+  let useIcon = AdmimHome; 
 
   switch (type) {
     case 'home':

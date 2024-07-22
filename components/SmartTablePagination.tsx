@@ -9,7 +9,6 @@ const classNames = {
 //----------------------
 
 export default function SmartTablePagination({ totalEntries, entriesPerPage, currentPage, handleClick}: SmartTablePaginationProps) {
-
   return (
     <div className="flex justify-center mt-4 gap-2">
       {Array.from({ length: Math.ceil(totalEntries / entriesPerPage) }, (_, index) => (
