@@ -31,7 +31,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to bask in
 
 
 ## Build it
-Easy-peasy, one-two-,uh, npm run build-y.
+Easy-peasy, one-two-,uh, npm run <em>build-sy</em>.
 
 ```bash
 npm run build
