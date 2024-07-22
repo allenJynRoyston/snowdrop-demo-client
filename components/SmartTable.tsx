@@ -119,13 +119,15 @@ export default function SmartTable<T extends Record<string, any>>({
       ) : (
         <div className="overflow-x-auto pb-10">
           {isFetching ? (
-            <>
-              <p className='text-red-400 text-center'>
-                The server is sleeping... waking it up now :D
-                <br></br>
-                (It could take a minute)
-              </p>              
-            </>
+            <div className='flex w-full justify-center'>
+              <div className="bg-white p-6 rounded-lg shadow-lg max-w-[400px]">
+                <p className='text-red-400 text-center'>
+                  The server is sleeping... waking it up now :D
+                  <br></br>
+                  (It could take a minute)
+                </p>              
+              </div>
+            </div>
           ) : (
             <div className='flex flex-col gap-10 bg-slate-300 bg-opacity-70 min-h-[600px] p-10 rounded-xl'>
   
