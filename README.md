@@ -40,9 +40,9 @@ npm run start
 ```
 
 ## Wait, what about the server?  Where's this data coming from?
-The sever lives in its own repo and is deployed to a render site.  This is done to prevent and CORS while developing and ensures 
-it'll work everywhere (dev/live environment).  The repo is private because it has username/passwords in it to access the database, but
-the code is quite simple as it's just a means to return some data.  Quite simply, it looks like this
+The sever lives in its own repo and is deployed to a [render.com](https://render.com).  This is done to prevent any COR (cross-origin request) issues while developing and ensures 
+it'll work everywhere (dev/live environment).  The repo is private because it has username/passwords in it to access the database, but the code is quite simple and it's really just a means to return some data.  
+It basically looks like this:
 
 ```bash
 import express from 'express';
