@@ -108,6 +108,7 @@ app.listen(port, async () => {
   await connectToMongoDB();
 });
 ```
+Actually there's nothing "basically" about that; that IS the code :D
 
 As you can tell, there's only one endpoint.  
 https://snowdrop-test-server.onrender.com/transactions
