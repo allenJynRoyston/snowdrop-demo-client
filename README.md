@@ -42,7 +42,7 @@ npm run start
 Again, open [http://localhost:3000](http://localhost:3000) with your browser to bask in all its (built) glory.
 
 ## Wait, what about the server?  Where's this data coming from?
-The sever lives in its own repo and is deployed to a [render.com](https://render.com).  This is done to prevent any COR (cross-origin request) issues while developing and ensures 
+The sever lives in its own repo and is deployed to a [render.com](https://render.com) instance.  This is done to prevent any COR (cross-origin request) issues while developing and ensures 
 it'll work everywhere (dev/live environment).  The repo is private because it has username/passwords in it to access the database, but the code is quite simple and it's really just a means to return some data.  
 It basically looks like this:
 
